@@ -5,118 +5,136 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Promo Code 领取示例（演示用）</title>
 <style>
-  body{font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f6f8fb; color:#111; padding:24px;}
-  .container{max-width:760px;margin:24px auto;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(13,38,76,0.08);padding:24px;}
+  body{font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#f6f8fb; color:#111; padding:24px;}
+  .container{max-width:760px;margin:24px auto;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(13,38,76,.08);padding:24px;}
   h1{margin:0 0 8px;font-size:1.4rem}
-  p.lead{color:#445;font-size:0.95rem}
-  label{display:block;margin-top:12px;font-weight:600;font-size:0.9rem}
-  input[type=text], input[type=email], input[type=tel], select, input[type=date], input[type=time]{
+  p.lead{color:#445;font-size:.95rem}
+  label{display:block;margin-top:12px;font-weight:600;font-size:.9rem}
+  input[type=text],input[type=email],input[type=tel],select,input[type=date],input[type=time]{
     width:100%;padding:10px;border:1px solid #d7dbe6;border-radius:6px;margin-top:6px;box-sizing:border-box;
   }
-  .row{display:flex;gap:12px}
-  .row > div{flex:1}
+  .row{display:flex;gap:12px}.row>div{flex:1}
   button{background:#1466f1;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:600;margin-top:14px;cursor:pointer}
-  .note{font-size:0.85rem;color:#556;margin-top:8px}
+  .note{font-size:.85rem;color:#556;margin-top:8px}
   .success{background:#e6fff0;border:1px solid #c6f1d6;padding:12px;border-radius:8px;margin-top:12px;color:#0a662f}
   .example{background:#f3f6ff;border:1px solid #e1e7ff;padding:12px;border-radius:8px;margin-top:12px}
-  footer{font-size:0.8rem;color:#667;margin-top:18px}
-  .small{font-size:0.85rem;color:#556;margin-top:6px}
+  footer{font-size:.8rem;color:#667;margin-top:18px}
+  .small{font-size:.85rem;color:#556;margin-top:6px}
   .hidden{display:none}
   table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:8px;border:1px solid #eee;text-align:left;font-size:0.9rem}
+  th,td{padding:8px;border:1px solid #eee;text-align:left;font-size:.9rem}
+
+  /* 简易模态弹窗 */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000}
+  .modal{background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);width:min(520px,92vw);padding:18px}
+  .modal h3{margin:0 0 6px;font-size:1.05rem}
+  .modal p{margin:8px 0 0;color:#444}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+  .btn-secondary{background:#e7ebf3;color:#223}
+  .btn-danger{background:#c62828}
+  .danger-text{color:#c62828;font-weight:700}
+
+  /* 信息汇总卡片 */
+  .card{background:#fff4f4;border:1px solid #ffd4d4;border-radius:10px;padding:12px;margin-top:12px}
+  .card h4{margin:0 0 8px}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px 10px;font-size:.95rem}
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>示例：领取机票 Promo Code（演示用页面）</h1>
-    <p class="lead">这是一个**演示/测试用**页面：展示如何说明获取 promo code 的途径，并允许用户填写旅行信息从下拉菜单选择 promo code 并领取。页面不会把数据发送到网络，仅保存在本地浏览器（localStorage）。</p>
+<div class="container">
+  <h1>示例：领取机票 Promo Code（演示用页面）</h1>
+  <p class="lead">此页面用于演示：说明获取 promo code 的途径 + 表单收集信息 + 领取前确认弹窗 + 领取后提示与信息汇总。页面仅在本地浏览器保存数据（localStorage），不发往网络。</p>
 
-    <h2>如何获取这些 Promo Code（示例方式）</h2>
-    <div class="example">
-      <ul>
-        <li>关注官方公众号或社交媒体活动——我们在特殊活动发布限时折扣代码。</li>
-        <li>订阅官方邮件通知——邮件订阅有专属新人 promo code（首次订阅）。</li>
-        <li>参加联名活动或返利平台——联名合作渠道会发放专属 code。</li>
-        <li>促销页面或合作伙伴页面–有时通过指定页面的“领取”按钮获得 code。</li>
-      </ul>
-      <div class="small">*以上为示例说明文字，仅供演示如何在网页上给用户提示。</div>
+  <h2>如何获取这些 Promo Code（示例方式）</h2>
+  <div class="example">
+    <ul>
+      <li>关注官方公众号或社媒活动，领取限时折扣码；</li>
+      <li>订阅官方邮件，新用户专属 welcome code；</li>
+      <li>合作伙伴/返利平台联名活动；</li>
+      <li>促销落地页点击「领取」按钮自动发放。</li>
+    </ul>
+    <div class="small">*上面仅为示例文案，实际活动以真实规则为准。</div>
+  </div>
+
+  <form id="promoForm" onsubmit="return false;">
+    <label>出发地（From）<input required id="from" type="text" placeholder="例如：Melbourne (MEL)"></label>
+    <label>目的地（To）<input required id="to" type="text" placeholder="例如：Sydney (SYD)"></label>
+
+    <div class="row">
+      <div><label>出发日期<input required id="date" type="date"></label></div>
+      <div><label>预计航班（可选）<input id="flight" type="text" placeholder="例如：QF400"></label></div>
     </div>
 
-    <form id="promoForm" onsubmit="return false;">
-      <label>出发地（From）<input required id="from" type="text" placeholder="例如：Melbourne (MEL)"></label>
+    <label>乘客姓名（Name）<input required id="name" type="text" placeholder="例如：Wang Xiaoming"></label>
+    <div class="row">
+      <div><label>邮箱（Email）<input required id="email" type="email" placeholder="example@mail.com"></label></div>
+      <div><label>联系电话（Phone）<input required id="phone" type="tel" placeholder="+61 4xx xxx xxx"></label></div>
+    </div>
 
-      <label>目的地（To）<input required id="to" type="text" placeholder="例如：Sydney (SYD)"></label>
+    <label>选择 Promo Code
+      <select id="promoSelect">
+        <option value="SAVE10">SAVE10 — 10% off (示例)</option>
+        <option value="FLY50">FLY50 — AUD50 off (示例)</option>
+        <option value="WEEKEND25">WEEKEND25 — Weekend 25% (示例)</option>
+        <option value="NEWUSER5">NEWUSER5 — $5 off for new users (示例)</option>
+      </select>
+    </label>
 
-      <div class="row">
-        <div>
-          <label>出发日期<input required id="date" type="date"></label>
-        </div>
-        <div>
-          <label>预计航班（可选）<input id="flight" type="text" placeholder="例如：QF400"></label>
-        </div>
-      </div>
+    <div class="note">注意：示例 code 仅用于演示，不具备真实抵扣功能。</div>
+    <button id="claimBtn">领取 Promo Code</button>
 
-      <label>乘客姓名（Name）<input required id="name" type="text" placeholder="例如：Wang Xiaoming"></label>
-      <div class="row">
-        <div>
-          <label>邮箱（Email）<input required id="email" type="email" placeholder="example@mail.com"></label>
-        </div>
-        <div>
-          <label>联系电话（Phone）<input required id="phone" type="tel" placeholder="+61 4xx xxx xxx"></label>
-        </div>
-      </div>
+    <div id="feedback" class="hidden success" role="status"></div>
 
-      <label>选择 Promo Code
-        <select id="promoSelect">
-          <option value="SAVE10">SAVE10 — 10% off (示例)</option>
-          <option value="FLY50">FLY50 — AUD50 off (示例)</option>
-          <option value="WEEKEND25">WEEKEND25 — Weekend 25% (示例)</option>
-          <option value="NEWUSER5">NEWUSER5 — $5 off for new users (示例)</option>
-        </select>
-      </label>
-
-      <div class="note">我们示例中展示的 code 仅用于演示。不要在真实支付流程中直接使用演示 code。</div>
-
-      <button id="claimBtn">领取 Promo Code</button>
-
-      <div id="feedback" class="hidden success" role="status"></div>
-    </form>
+    <!-- 领取后：信息汇总 + 警示 -->
+    <div id="exfilCard" class="hidden card">
+      <h4 class="danger-text">你的信息被盗取了（模拟演示）</h4>
+      <div class="kv" id="summaryKV"></div>
+      <div class="small">* 此为安全教育/演示效果，用于提醒用户谨慎提交信息。实际本页面不把数据上传至服务器。</div>
+    </div>
 
     <div class="small">
-      <strong>测试记录（保存在本地浏览器，仅供演示）：</strong>
+      <strong>本地测试记录（localStorage，仅演示）：</strong>
       <table id="recordsTable">
         <thead><tr><th>时间</th><th>姓名</th><th>航程</th><th>Promo</th></tr></thead>
         <tbody id="recordsBody"></tbody>
       </table>
     </div>
+  </form>
 
-    <footer>
-      <div>说明：此页面为静态演示，所有数据仅保存在本地浏览器（localStorage）。如需把数据发送到服务器，请配置后端 API 并替换对应 JS。</div>
-    </footer>
+  <footer>
+    <div>声明：本页为静态演示，数据仅存于浏览器 localStorage。如需接入真实后端，请遵循法律/隐私合规并获得明确同意。</div>
+  </footer>
+</div>
+
+<!-- 模态弹窗 -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">领取前确认</h3>
+    <p>领取 code 表示同意信息收集协议。</p>
+    <div class="modal-actions">
+      <button id="cancelBtn" class="btn-secondary" type="button">取消</button>
+      <button id="confirmBtn" type="button">确定</button>
+    </div>
   </div>
+</div>
 
 <script>
 (function(){
-  // 本地保存键名
-  const STORAGE_KEY = 'promo_demo_records_v1';
+  const STORAGE_KEY = 'promo_demo_records_v2';
+  const $ = id => document.getElementById(id);
+  const nowStr = () => new Date().toLocaleString();
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // helpers
-  function $(id){ return document.getElementById(id); }
-  function nowStr(){ return new Date().toLocaleString(); }
-
-  // 读取并渲染记录
   function loadRecords(){
     const raw = localStorage.getItem(STORAGE_KEY);
     const arr = raw ? JSON.parse(raw) : [];
-    const tbody = $('recordsBody');
-    tbody.innerHTML = '';
-    arr.slice().reverse().forEach(r => {
+    const tbody = $('recordsBody'); tbody.innerHTML='';
+    arr.slice().reverse().forEach(r=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${r.time}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.from)} → ${escapeHtml(r.to)} (${escapeHtml(r.flight||'—')})</td><td>${escapeHtml(r.promo)}</td>`;
+      tr.innerHTML = `<td>${r.time}</td><td>${esc(r.name)}</td><td>${esc(r.from)} → ${esc(r.to)} (${esc(r.flight||'—')})</td><td>${esc(r.promo)}</td>`;
       tbody.appendChild(tr);
     });
   }
-
   function saveRecord(rec){
     const raw = localStorage.getItem(STORAGE_KEY);
     const arr = raw ? JSON.parse(raw) : [];
@@ -125,10 +143,24 @@
     loadRecords();
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  // 模态弹窗控制
+  const backdrop = $('modalBackdrop');
+  const openModal = () => { backdrop.style.display='flex'; backdrop.setAttribute('aria-hidden','false'); };
+  const closeModal = () => { backdrop.style.display='none'; backdrop.setAttribute('aria-hidden','true'); };
+  $('cancelBtn').addEventListener('click', closeModal);
 
-  // 领取流程（模拟）
+  // 点击领取按钮 -> 打开确认弹窗
   $('claimBtn').addEventListener('click', () => {
+    // 先做必填校验（不通过不弹窗）
+    const req = ['from','to','date','name','email','phone'];
+    for (const id of req){ if(!$(id).value.trim()){ alert('请完整填写必填项（出发地/目的地/日期/姓名/邮箱/电话）。'); return; } }
+    openModal();
+  });
+
+  // 确认 -> 生成领取与显示反馈/信息汇总
+  $('confirmBtn').addEventListener('click', () => {
+    closeModal();
+
     const from = $('from').value.trim();
     const to = $('to').value.trim();
     const date = $('date').value;
@@ -138,43 +170,30 @@
     const phone = $('phone').value.trim();
     const promo = $('promoSelect').value;
 
-    // 简单校验
-    if(!from || !to || !date || !name || !email || !phone){
-      alert('请完整填写必填项（出发地/目的地/日期/姓名/邮箱/电话）。');
-      return;
-    }
+    function genClaimId(){ return promo + '-' + Math.random().toString(36).slice(2,9).toUpperCase(); }
+    const claimId = genClaimId();
 
-    // 生成一个“领取码”示例（仅本地演示）
-    function generateClaimId(){
-      return promo + '-' + Math.random().toString(36).slice(2,9).toUpperCase();
-    }
-    const claimId = generateClaimId();
-    const message = `领取成功！\n兑换码：${claimId}\n使用说明：在支付页面输入兑换码并按规则抵扣（示例）`;
-
-    // 显示成功反馈（并保存记录到 localStorage）
     const feedback = $('feedback');
     feedback.classList.remove('hidden');
-    feedback.innerHTML = `<strong>领取成功</strong><div style="margin-top:6px">${escapeHtml(message).replace(/\n/g,'<br>')}</div>`;
+    feedback.innerHTML = `<strong>领取成功</strong><div style="margin-top:6px">兑换码：${esc(claimId)}<br>使用：在支付页面输入兑换码并按规则抵扣（示例）。</div>`;
 
-    // 保存记录（时间、姓名、航程、promo、claimId）到 localStorage（仅本地）
-    saveRecord({
-      time: nowStr(),
-      name: name,
-      from: from,
-      to: to,
-      date: date,
-      flight: flight,
-      email: email,
-      phone: phone,
-      promo: promo,
-      claimId: claimId
-    });
+    // 保存记录（本地）
+    const rec = { time: nowStr(), name, from, to, date, flight, email, phone, promo, claimId };
+    saveRecord(rec);
 
-    // 清理/选项：不清表单，以便测试；若想清空，取消下一段注释：
-    // document.getElementById('promoForm').reset();
+    // 信息汇总 + 红色警示（模拟“被盗取”效果，仅演示）
+    const kv = $('summaryKV');
+    kv.innerHTML = `
+      <div>姓名</div><div>${esc(name)}</div>
+      <div>邮箱</div><div>${esc(email)}</div>
+      <div>电话</div><div>${esc(phone)}</div>
+      <div>行程</div><div>${esc(from)} → ${esc(to)}（${esc(date)}，航班：${esc(flight||'—')}）</div>
+      <div>Promo</div><div>${esc(promo)}</div>
+      <div>领取码</div><div>${esc(claimId)}</div>
+    `;
+    $('exfilCard').classList.remove('hidden');
   });
 
-  // 页面初始化
   loadRecords();
 })();
 </script>
