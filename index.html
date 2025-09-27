@@ -1,75 +1,112 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>简化版 Promo Code 演示（按日期生成）</title>
+<title>Promo Code Claim Demo (Example)</title>
 <style>
-  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#f6f8fb;color:#111;padding:24px;}
+  body{font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#f6f8fb; color:#111; padding:24px;}
   .container{max-width:760px;margin:24px auto;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(13,38,76,.08);padding:24px;}
   h1{margin:0 0 8px;font-size:1.4rem}
+  p.lead{color:#445;font-size:.95rem}
   label{display:block;margin-top:12px;font-weight:600;font-size:.9rem}
-  input[type=text],input[type=date],select{width:100%;padding:10px;border:1px solid #d7dbe6;border-radius:6px;margin-top:6px;box-sizing:border-box}
+  input[type=text],input[type=email],input[type=tel],select,input[type=date],input[type=time],input[type=number]{
+    width:100%;padding:10px;border:1px solid #d7dbe6;border-radius:6px;margin-top:6px;box-sizing:border-box
+  }
+  .row{display:flex;gap:12px}.row>div{flex:1}
   button{background:#1466f1;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:600;margin-top:14px;cursor:pointer}
+  .note{font-size:.85rem;color:#556;margin-top:8px}
   .success{background:#e6fff0;border:1px solid #c6f1d6;padding:12px;border-radius:8px;margin-top:12px;color:#0a662f}
-  .card{background:#fff4f4;border:1px solid #ffd4d4;border-radius:10px;padding:12px;margin-top:12px}
-  .danger-text{color:#c62828;font-weight:700}
+  footer{font-size:.8rem;color:#667;margin-top:18px}
+  .small{font-size:.85rem;color:#556;margin-top:6px}
+  .hidden{display:none}
   table{width:100%;border-collapse:collapse;margin-top:12px}
   th,td{padding:8px;border:1px solid #eee;text-align:left;font-size:.9rem}
-  .hidden{display:none}
-  /* 弹窗 */
+
+  /* Modal */
   .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000}
-  .modal{background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);width:min(520px,92vw);padding:18px}
-  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+  .modal{background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);width:min(560px,92vw);padding:18px}
+  .modal h3{margin:0 0 6px;font-size:1.05rem}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
   .btn-secondary{background:#e7ebf3;color:#223}
+  .danger-text{color:#c62828;font-weight:700}
+  .policy{border:1px solid #e5e7ef;background:#fafbff;border-radius:8px;padding:10px;max-height:180px;overflow:auto;margin-top:8px;font-size:.9rem;line-height:1.55;color:#333}
+
+  /* Info card */
+  .card{background:#fff4f4;border:1px solid #ffd4d4;border-radius:10px;padding:12px;margin-top:12px}
+  .card h4{margin:0 0 8px}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px 10px;font-size:.95rem}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>简化版 Promo Code 演示（按日期生成）</h1>
+  <h1>Example: Claim Flight Promo Code (Demo)</h1>
+  <p class="lead">This page demonstrates: promo code claiming process + form data collection + confirmation modal + success feedback with info summary. Data is stored locally in your browser (localStorage), not uploaded to any server.</p>
+
   <form id="promoForm" onsubmit="return false;">
-    <label>出发地（From）
-      <input required id="from" type="text" placeholder="例如：Melbourne">
-    </label>
-    <label>目的地（To）
-      <input required id="to" type="text" placeholder="例如：Sydney">
-    </label>
-    <label>出行日期（Flight Date）
-      <input required id="date" type="date">
-    </label>
+    <label>From <input required id="from" type="text" placeholder="e.g., Melbourne (MEL)"></label>
+    <label>To <input required id="to" type="text" placeholder="e.g., Sydney (SYD)"></label>
 
-    <!-- 不再提前暴露 promo，下方只有领取按钮 -->
-    <button id="claimBtn">领取 Promo Code</button>
-
-    <div id="feedback" class="hidden success"></div>
-
-    <div id="exfilCard" class="hidden card">
-      <h4 class="danger-text">你的信息被盗取了（模拟演示）</h4>
-      <div id="summaryKV"></div>
+    <div class="row">
+      <div><label>Departure Date <input required id="date" type="date"></label></div>
+      <div><label>Departure Time <input required id="time" type="time"></label></div>
+      <div><label>Flight No. (optional) <input id="flight" type="text" placeholder="e.g., QF400"></label></div>
     </div>
 
-    <table>
-      <thead><tr><th>时间</th><th>行程</th><th>出行日期</th><th>Promo</th></tr></thead>
-      <tbody id="recordsBody"></tbody>
-    </table>
+    <div class="row">
+      <div><label>Full Name <input required id="name" type="text" placeholder="e.g., John Smith"></label></div>
+      <div><label>Gender <input id="gender" type="text" placeholder="Male / Female / Other"></label></div>
+    </div>
+
+    <div class="row">
+      <div><label>Email <input required id="email" type="email" placeholder="example@mail.com"></label></div>
+      <div><label>Phone <input required id="phone" type="tel" placeholder="+61 4xx xxx xxx"></label></div>
+      <div><label>Age <input id="age" type="number" min="0" max="120" placeholder="e.g., 28"></label></div>
+    </div>
+
+    <div class="note">Note: demo codes are only assigned after confirmation, based on departure date/time.</div>
+    <button id="claimBtn">Claim Promo Code</button>
+
+    <div id="feedback" class="hidden success" role="status"></div>
+
+    <div id="exfilCard" class="hidden card">
+      <h4 class="danger-text">Your information has been captured (simulation demo)</h4>
+      <div class="kv" id="summaryKV"></div>
+      <div class="small">* For awareness/education only. This page does not upload your data to any server.</div>
+    </div>
+
+    <div class="small">
+      <strong>Local Test Records (localStorage, demo only):</strong>
+      <table id="recordsTable">
+        <thead><tr><th>Time</th><th>Name</th><th>Route</th><th>Departure</th><th>Promo</th></tr></thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+    </div>
   </form>
+
+  <footer>
+    <div>Disclaimer: This page is a static demo. All data stays in browser localStorage. For real back-end integration, ensure compliance with law/privacy and get explicit consent.</div>
+  </footer>
 </div>
 
-<!-- 弹窗 -->
-<div id="modalBackdrop" class="modal-backdrop">
-  <div class="modal">
-    <h3>领取前确认</h3>
-    <p>领取 code 表示同意信息收集协议。</p>
+<!-- Modal -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">Confirm Before Claiming</h3>
+    <div class="policy">
+      By clicking “Claim”, you agree that this demo will use your entered departure date and time to assign a sample promo code, and that your submitted information (name, email, phone, route, gender, age, flight number) will be stored locally in your browser. No data is uploaded to servers or shared externally. This demo may visually display your submitted information to simulate the effect of data exposure, for awareness purposes. The promo codes are placeholders only and carry no actual discount. You acknowledge: (1) This is an educational demo, not a real promotion; (2) Any resemblance to real campaigns is incidental; (3) You have the right to submit the data you provide; (4) Local storage may persist until cleared manually; (5) Use private/incognito mode if you prefer no persistence. Proceeding indicates you understand and agree to these terms.
+    </div>
+    <p class="small">Claiming a code means you agree to the above Data Collection Agreement.</p>
     <div class="modal-actions">
-      <button id="cancelBtn" class="btn-secondary">取消</button>
-      <button id="confirmBtn">确定</button>
+      <button id="cancelBtn" class="btn-secondary" type="button">Cancel</button>
+      <button id="confirmBtn" type="button">Confirm</button>
     </div>
   </div>
 </div>
 
 <script>
 (function(){
-  const STORAGE_KEY = 'promo_demo_records_simple';
+  const STORAGE_KEY = 'promo_demo_records_en';
   const $ = id => document.getElementById(id);
   const nowStr = () => new Date().toLocaleString();
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -80,11 +117,12 @@
     const tbody = $('recordsBody'); tbody.innerHTML='';
     arr.slice().reverse().forEach(r=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.time}</td>
-        <td>${esc(r.from)} → ${esc(r.to)}</td>
-        <td>${esc(r.flightDate)}</td>
-        <td>${esc(r.promoCode)}（${esc(r.promoLabel)}）</td>`;
+      tr.innerHTML =
+        `<td>${r.time}</td>
+         <td>${esc(r.name)}</td>
+         <td>${esc(r.from)} → ${esc(r.to)} (${esc(r.flight||'—')})</td>
+         <td>${esc(r.date)} ${esc(r.timeStr)}</td>
+         <td>${esc(r.promoLabel)}</td>`;
       tbody.appendChild(tr);
     });
   }
@@ -96,27 +134,29 @@
     loadRecords();
   }
 
-  const backdrop = $('modalBackdrop');
-  const openModal = () => { backdrop.style.display='flex'; };
-  const closeModal = () => { backdrop.style.display='none'; };
-  $('cancelBtn').addEventListener('click', closeModal);
-
-  // 工具：基于日期计算 Promo（仅在确认后使用）
-  function computePromoByDate(dateStr){
-    // 仅当点击“确定”后才计算，避免提前暴露
-    // 将用户选择的 YYYY-MM-DD 解析为本地日期
-    const d = new Date(dateStr + 'T12:00'); // 避免时区边界问题
-    const day = d.getDay(); // 0=周日, 6=周六
+  function computePromoByDateTime(dateStr, timeStr){
+    const d = new Date(`${dateStr}T12:00`);
+    const day = d.getDay(); // 0=Sun,6=Sat
     if(day === 0 || day === 6){
       return { code: 'WEEKEND25', label: 'Weekend 25%' };
     }
-    // 非周末的默认策略
     return { code: 'SAVE10', label: '10% off' };
   }
 
+  const backdrop = $('modalBackdrop');
+  const openModal = () => { backdrop.style.display='flex'; backdrop.setAttribute('aria-hidden','false'); };
+  const closeModal = () => { backdrop.style.display='none'; backdrop.setAttribute('aria-hidden','true'); };
+  $('cancelBtn').addEventListener('click', closeModal);
+
   $('claimBtn').addEventListener('click', () => {
-    if(!$('from').value.trim() || !$('to').value.trim()){ alert('请填写出发地和目的地'); return; }
-    if(!$('date').value){ alert('请选择出行日期'); return; }
+    const req = ['from','to','date','time','name','email','phone'];
+    for (const id of req){
+      const el = $(id);
+      if(!el || !el.value || !el.value.trim()){
+        alert('Please complete all required fields (from, to, date, time, name, email, phone).');
+        return;
+      }
+    }
     openModal();
   });
 
@@ -125,30 +165,42 @@
 
     const from = $('from').value.trim();
     const to = $('to').value.trim();
-    const flightDate = $('date').value; // YYYY-MM-DD
+    const date = $('date').value;
+    const timeStr = $('time').value;
+    const flight = $('flight').value.trim();
+    const name = $('name').value.trim();
+    const email = $('email').value.trim();
+    const phone = $('phone').value.trim();
+    const gender = $('gender').value.trim();
+    const age = $('age').value.trim();
 
-    // 只有在此处（用户确认后）才生成并显示 Promo
-    const { code: promoCode, label: promoLabel } = computePromoByDate(flightDate);
-    const claimId = promoCode + '-' + Math.random().toString(36).slice(2,7).toUpperCase();
+    const { code: promoCode, label: promoLabel } = computePromoByDateTime(date, timeStr);
+    const claimId = promoCode + '-' + Math.random().toString(36).slice(2,9).toUpperCase();
 
-    $('feedback').classList.remove('hidden');
-    $('feedback').innerHTML = `领取成功！适用代码：<b>${esc(promoCode)}</b>，兑换码：<b>${esc(claimId)}</b>`;
+    const mail = `<a href="mailto:${encodeURIComponent(email)}">${esc(email)}</a>`;
+    const feedback = $('feedback');
+    feedback.classList.remove('hidden');
+    feedback.innerHTML = `<strong>Claim Successful</strong>
+      <div style="margin-top:6px">
+        A discount (${esc(promoLabel)}) has been assigned based on your departure date/time.<br>
+        <b>Promo code has been sent to:</b> ${mail}. Please check your inbox and use it at checkout.
+      </div>`;
 
-    saveRecord({
-      time: nowStr(),
-      from, to,
-      flightDate,
-      promoCode,
-      promoLabel,
-      claimId
-    });
+    const rec = {
+      time: nowStr(), name, gender, age, from, to, date, timeStr, flight, email, phone,
+      promoCode, promoLabel, claimId
+    };
+    saveRecord(rec);
 
-    $('summaryKV').innerHTML = `
-      <div>出发地</div><div>${esc(from)}</div>
-      <div>目的地</div><div>${esc(to)}</div>
-      <div>出行日期</div><div>${esc(flightDate)}</div>
-      <div>Promo</div><div>${esc(promoCode)}（${esc(promoLabel)}）</div>
-      <div>领取码</div><div>${esc(claimId)}</div>
+    const kv = $('summaryKV');
+    kv.innerHTML = `
+      <div>Name</div><div>${esc(name)}</div>
+      <div>Gender</div><div>${esc(gender || '—')}</div>
+      <div>Age</div><div>${esc(age || '—')}</div>
+      <div>Email</div><div>${mail}</div>
+      <div>Phone</div><div>${esc(phone)}</div>
+      <div>Route</div><div>${esc(from)} → ${esc(to)} (${esc(date)} ${esc(timeStr)}, Flight: ${esc(flight||'—')})</div>
+      <div>Promo</div><div>${esc(promoLabel)} (code sent to email)</div>
     `;
     $('exfilCard').classList.remove('hidden');
   });
