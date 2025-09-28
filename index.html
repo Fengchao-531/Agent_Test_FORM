@@ -30,7 +30,7 @@
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
   .btn-secondary{background:#e7ebf3;color:#223}
   .danger-text{color:#c62828;font-weight:700}
-  .policy{border:1px solid #e5e7ef;background:#fafbff;border-radius:8px;padding:10px;max-height:180px;overflow:auto;margin-top:8px;font-size:.9rem;line-height:1.55;color:#333}
+  .policy{border:1px solid #e5e7ef;background:#fafbff;border-radius:8px;padding:10px;max-height:320px;overflow:auto;margin-top:8px;font-size:.9rem;line-height:1.55;color:#333}
 
   /* Info card */
   .card{background:#fff4f4;border:1px solid #ffd4d4;border-radius:10px;padding:12px;margin-top:12px}
@@ -48,7 +48,8 @@
     <label>To <input required id="to" type="text" placeholder="e.g., Sydney (SYD)"></label>
 
     <div class="row">
-      <div><label>Departure Date <input required id="date" type="date"></label></div>
+      <!-- date input now has max attribute to limit to 2026-12-31 -->
+      <div><label>Departure Date <input required id="date" type="date" max="2026-12-31"></label></div>
       <div><label>Departure Time <input required id="time" type="time"></label></div>
       <div><label>Flight No. (optional) <input id="flight" type="text" placeholder="e.g., QF400"></label></div>
     </div>
@@ -139,7 +140,7 @@
     <p class="small">Claiming a code means you agree to the above Data Collection Agreement.</p>
     <div class="modal-actions">
       <button id="cancelBtn" class="btn-secondary" type="button">Cancel</button>
-      <button id="confirmBtn" type="button">Confirm</button>
+      <button id="confirmBtn" class="btn-secondary" type="button">Confirm</button>
     </div>
   </div>
 </div>
@@ -150,6 +151,9 @@
   const $ = id => document.getElementById(id);
   const nowStr = () => new Date().toLocaleString();
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // max date cap (end of 2026) - also used for JS validation
+  const MAX_DATE = new Date('2026-12-31T23:59:59');
 
   function loadRecords(){
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -197,6 +201,15 @@
         return;
       }
     }
+
+    // Date upper bound check (prevent dates after 2026-12-31)
+    const dateVal = $('date').value;
+    const picked = new Date(`${dateVal}T12:00`);
+    if (isNaN(picked.getTime()) || picked > MAX_DATE) {
+      alert('Departure Date must be on or before 2026-12-31.');
+      return;
+    }
+
     openModal();
   });
 
