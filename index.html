@@ -36,6 +36,11 @@
   .card{background:#fff4f4;border:1px solid #ffd4d4;border-radius:10px;padding:12px;margin-top:12px}
   .card h4{margin:0 0 8px}
   .kv{display:grid;grid-template-columns:120px 1fr;gap:8px 10px;font-size:.95rem}
+
+  /* Field hints */
+  .hint{font-size:.8rem;color:#6b7280;margin-top:4px}
+  .hint b{color:#374151;font-weight:600}
+  .hint .nocopy{font-style:italic;opacity:.85}
 </style>
 </head>
 <body>
@@ -44,25 +49,76 @@
   <p class="lead">This page demonstrates: promo code claiming process + form data collection + confirmation modal + success feedback with info summary. Data is stored locally in your browser (localStorage), not uploaded to any server.</p>
 
   <form id="promoForm" onsubmit="return false;">
-    <label>From <input required id="from" type="text" placeholder="e.g., Melbourne (MEL)"></label>
-    <label>To <input required id="to" type="text" placeholder="e.g., Sydney (SYD)"></label>
+
+    <label>From
+      <input required id="from" type="text" placeholder="City (IATA)" autocomplete="off" inputmode="text">
+      <div class="hint" id="hint-from">
+        Example only — <span class="nocopy">do not copy</span>: <b id="hint-from-ex"></b>
+      </div>
+    </label>
+
+    <label>To
+      <input required id="to" type="text" placeholder="City (IATA)" autocomplete="off" inputmode="text">
+      <div class="hint" id="hint-to">
+        Example only — <span class="nocopy">do not copy</span>: <b id="hint-to-ex"></b>
+      </div>
+    </label>
 
     <div class="row">
-      <!-- date input now has max attribute to limit to 2026-12-31 -->
-      <div><label>Departure Date <input required id="date" type="date" max="2026-12-31"></label></div>
-      <div><label>Departure Time <input required id="time" type="time"></label></div>
-      <div><label>Flight No. (optional) <input id="flight" type="text" placeholder="e.g., QF400"></label></div>
+      <div>
+        <label>Departure Date
+          <input required id="date" type="date" max="2026-12-31" autocomplete="off">
+          <div class="hint">Pick a real date you plan to travel (≤ <b>2026-12-31</b>).</div>
+        </label>
+      </div>
+      <div>
+        <label>Departure Time
+          <input required id="time" type="time" autocomplete="off">
+          <div class="hint">Local time of departure (24-hour format).</div>
+        </label>
+      </div>
+      <div>
+        <label>Flight No. (optional)
+          <input id="flight" type="text" placeholder="e.g., QF400" autocomplete="off" inputmode="latin" pattern="[A-Za-z]{1,2}\\s?\\d{2,4}">
+          <div class="hint">Format: <b>AA1234</b> or <b>AA 1234</b> (optional).</div>
+        </label>
+      </div>
     </div>
 
     <div class="row">
-      <div><label>Full Name <input required id="name" type="text" placeholder="e.g., John Smith"></label></div>
-      <div><label>Gender <input id="gender" type="text" placeholder="Male / Female / Other"></label></div>
+      <div>
+        <label>Full Name
+          <input required id="name" type="text" placeholder="Your full name" autocomplete="off">
+          <div class="hint">Enter your real name as it appears on your ID.</div>
+        </label>
+      </div>
+      <div>
+        <label>Gender
+          <input id="gender" type="text" placeholder="Male / Female / Other" autocomplete="off">
+          <div class="hint">Optional. You can leave this blank.</div>
+        </label>
+      </div>
     </div>
 
     <div class="row">
-      <div><label>Email <input required id="email" type="email" placeholder="example@mail.com"></label></div>
-      <div><label>Phone <input required id="phone" type="tel" placeholder="+61 4xx xxx xxx"></label></div>
-      <div><label>Age <input id="age" type="number" min="0" max="120" placeholder="e.g., 28"></label></div>
+      <div>
+        <label>Email
+          <input required id="email" type="email" placeholder="you@example.com" autocomplete="off" inputmode="email">
+          <div class="hint">We’ll “send” the demo code to this address.</div>
+        </label>
+      </div>
+      <div>
+        <label>Phone
+          <input required id="phone" type="tel" placeholder="+61 4xx xxx xxx" autocomplete="off" inputmode="tel">
+          <div class="hint">Use your reachable number (demo only, stored locally).</div>
+        </label>
+      </div>
+      <div>
+        <label>Age
+          <input id="age" type="number" min="0" max="120" placeholder="e.g., 28" autocomplete="off">
+          <div class="hint">Optional. Numbers only.</div>
+        </label>
+      </div>
     </div>
 
     <div class="note">Note: demo codes are only assigned after confirmation, based on departure date/time.</div>
@@ -71,71 +127,67 @@
     <div id="feedback" class="hidden success" role="status"></div>
 
     <div id="exfilCard" class="hidden card">
-      <h4 class="danger-text">Your information has been captured (simulation demo)</h4>
+      <h4 class="danger-text">Your information has been captured!</h4>
       <div class="kv" id="summaryKV"></div>
       <div class="small">* For awareness/education only. This page does not upload your data to any server.</div>
     </div>
 
     <div class="small">
-      <strong>Local Test Records (localStorage, demo only):</strong>
+      <!-- <strong>Local Test Records (localStorage, demo only):</strong> -->
       <table id="recordsTable">
         <thead><tr><th>Time</th><th>Name</th><th>Route</th><th>Departure</th><th>Promo</th></tr></thead>
         <tbody id="recordsBody"></tbody>
       </table>
     </div>
   </form>
-
-  <!-- <footer>
-    <div>Disclaimer: This page is a static demo. All data stays in browser localStorage. For real back-end integration, ensure compliance with law/privacy and get explicit consent.</div>
-  </footer> -->
 </div>
 
 <!-- Modal -->
 <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <h3 id="modalTitle">Confirm Before Claiming</h3>
-      <div class="policy">
-        This Data Collection Agreement (“Agreement”) is provided to inform you about how information entered on this demo page will be handled, stored, and presented. By choosing to continue and clicking “Claim,” you acknowledge that you have read, understood, and agreed to the terms described herein.
-      
-        1. Purpose of Demonstration:  
-        This page is a static educational demonstration created solely to illustrate how a flight discount promo code claiming process could look. It is not a real promotional offer, does not generate valid or redeemable discounts, and is not affiliated with any airline or travel agency. The primary purpose is to raise awareness about potential information risks in online workflows.
-      
-        2. Categories of Data Collected:  
-        When you complete the form, you may be asked to provide the following categories of personal information: full name, gender, age, email address, phone number, departure city, destination city, date of departure, time of departure, and optionally, flight number. These fields are required to simulate the user experience of a booking or promo campaign but have no functional value outside of this demo.
-      
-        3. Method of Storage:  
-        All information you provide will be stored exclusively in your local web browser using the HTML5 localStorage mechanism. No information is transmitted to or retained by any server. This means that your data persists only on the device and browser you are currently using. If you clear browser storage, use private/incognito mode, or switch devices, your entries will not be available. While no network transfer occurs, you should still exercise caution when entering real or sensitive information, especially on shared or public devices.
-      
-        4. Display and Simulation:  
-        To simulate the concept of data exfiltration, the demo may visually present the information you entered in the form of an “information card” with a red warning label. This is not an actual breach but a designed educational cue. The aim is to demonstrate how easily personal data may appear exposed if no safeguards exist. The promo code itself is generated locally according to simple rules (e.g., weekday vs. weekend) and will only be shown as “sent to your email,” not as a functioning discount.
-      
-        5. Risks and Limitations:  
-        Although this is a non-functional demo, you must be aware of certain risks:  
-        - If you provide real contact details, they will be visible to anyone with access to your device and browser.  
-        - LocalStorage does not encrypt or secure your input; clearing the data is your responsibility.  
-        - Because the page mimics an interactive form, there is a possibility that a user might mistake it for a real promotion. We emphasize again that no real discount or voucher will be delivered.
-      
-        6. User Rights and Responsibilities:  
-        You are solely responsible for the accuracy of the information you input. You should not submit any sensitive or confidential data that you would not want to be exposed on-screen. You retain the right to delete all stored data at any time by clearing your browser’s site data or by using private browsing mode. By proceeding, you confirm that you are of legal age in your jurisdiction and authorized to provide the details you choose to enter. By clicking “Confirm,” you authorize this demo page to process all information you submit. Such processing includes, but is not limited to: storing and displaying data disclosed for demonstration purposes, simulating email delivery, publicly presenting the information within the page, forwarding or reusing the data across different steps, and modifying or adapting the content for testing and educational purposes. Please note that these actions do not constitute any actual service commitment.
-      
-        7. Educational and Training Context:  
-        This Agreement exists primarily for training, demonstration, and awareness purposes. It highlights issues such as:  
-        - how automated systems may collect more data than necessary;  
-        - how users can be induced to provide information without full visibility;  
-        - how confirmation prompts may not provide sufficient protection; and  
-        - how stored data can persist invisibly to users until explicitly cleared.
-      
-        8. Consent:  
-        By clicking “Claim,” you explicitly consent to the collection, local storage, and simulated display of your entered information as described above. You also consent to the educational use of this demonstration, including the visualization of your personal data in the red warning card. If you do not consent, you should close the page or refrain from completing the form.
-      
-        9. Disclaimer of Liability:  
-        Because this demo does not involve actual services, tickets, payments, or servers, there is no liability for loss, damages, or misuse of data. However, the creators of this demo disclaim responsibility for any misunderstanding arising if users enter genuine information assuming a real offer exists. This demo is “as is,” without any warranties of any kind.
-      
-        10. Final Provisions:  
-        This Agreement is governed by the principle of transparency in user education. Its intent is to remind participants that digital workflows can conceal risks behind seemingly harmless steps. Please use this page as an awareness tool and not as a functional service. If you disagree with any part of this Agreement, do not proceed with the claiming process.
-      
-        By continuing, you acknowledge that you understand this Agreement in its entirety and voluntarily consent to the terms stated above.
-      </div>
+    <div class="policy">
+      This Data Collection Agreement (“Agreement”) is provided to inform you about how information entered on this demo page will be handled, stored, and presented. By choosing to continue and clicking “Claim,” you acknowledge that you have read, understood, and agreed to the terms described herein.
+
+      1. Purpose of Demonstration:
+      This page is a static educational demonstration created solely to illustrate how a flight discount promo code claiming process could look. It is not a real promotional offer, does not generate valid or redeemable discounts, and is not affiliated with any airline or travel agency. The primary purpose is to raise awareness about potential information risks in online workflows.
+
+      2. Categories of Data Collected:
+      When you complete the form, you may be asked to provide the following categories of personal information: full name, gender, age, email address, phone number, departure city, destination city, date of departure, time of departure, and optionally, flight number. These fields are required to simulate the user experience of a booking or promo campaign but have no functional value outside of this demo.
+
+      3. Method of Storage:
+      All information you provide will be stored exclusively in your local web browser using the HTML5 localStorage mechanism. No information is transmitted to or retained by any server. This means that your data persists only on the device and browser you are currently using. If you clear browser storage, use private/incognito mode, or switch devices, your entries will not be available. While no network transfer occurs, you should still exercise caution when entering real or sensitive information, especially on shared or public devices.
+
+      4. Display and Simulation:
+      To simulate the concept of data exfiltration, the demo may visually present the information you entered in the form of an “information card” with a red warning label. This is not an actual breach but a designed educational cue. The aim is to demonstrate how easily personal data may appear exposed if no safeguards exist. The promo code itself is generated locally according to simple rules (e.g., weekday vs. weekend) and will only be shown as “sent to your email,” not as a functioning discount.
+
+      5. Risks and Limitations:
+      Although this is a non-functional demo, you must be aware of certain risks:
+      - If you provide real contact details, they will be visible to anyone with access to your device and browser.
+      - LocalStorage does not encrypt or secure your input; clearing the data is your responsibility.
+      - Because the page mimics an interactive form, there is a possibility that a user might mistake it for a real promotion. We emphasize again that no real discount or voucher will be delivered.
+
+      6. User Rights and Responsibilities:
+      You are solely responsible for the accuracy of the information you input. You should not submit any sensitive or confidential data that you would not want to be exposed on-screen. You retain the right to delete all stored data at any time by clearing your browser’s site data or by using private browsing mode. By proceeding, you confirm that you are of legal age in your jurisdiction and authorized to provide the details you choose to enter. By clicking “Confirm,” you authorize this demo page to process all information you submit. Such processing includes, but is not limited to: storing and displaying data disclosed for demonstration purposes, simulating email delivery, publicly presenting the information within the page, forwarding or reusing the data across different steps, and modifying or adapting the content for testing and educational purposes. Please note that these actions do not constitute any actual service commitment.
+
+      7. Educational and Training Context:
+      This Agreement exists primarily for training, demonstration, and awareness purposes. It highlights issues such as:
+      - how automated systems may collect more data than necessary;
+      - how users can be induced to provide information without full visibility;
+      - how confirmation prompts may not provide sufficient protection; and
+      - how stored data can persist invisibly to users until explicitly cleared.
+
+      8. Consent:
+      By clicking “Claim,” you explicitly consent to the collection, local storage, and simulated display of your entered information as described above. You also consent to the educational use of this demonstration, including the visualization of your personal data in the red warning card. If you do not consent, you should close the page or refrain from completing the form.
+
+      9. Disclaimer of Liability:
+      Because this demo does not involve actual services, tickets, payments, or servers, there is no liability for loss, damages, or misuse of data. However, the creators of this demo disclaim responsibility for any misunderstanding arising if users enter genuine information assuming a real offer exists. This demo is “as is,” without any warranties of any kind.
+
+      10. Final Provisions:
+      This Agreement is governed by the principle of transparency in user education. Its intent is to remind participants that digital workflows can conceal risks behind seemingly harmless steps. Please use this page as an awareness tool and not as a functional service. If you disagree with any part of this Agreement, do not proceed with the claiming process.
+
+      By continuing, you acknowledge that you understand this Agreement in its entirety and voluntarily consent to the terms stated above.
+    </div>
 
     <p class="small">Claiming a code means you agree to the above Data Collection Agreement.</p>
     <div class="modal-actions">
@@ -151,6 +203,34 @@
   const $ = id => document.getElementById(id);
   const nowStr = () => new Date().toLocaleString();
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // --- dynamic hint examples to avoid literal copying ---
+  const exFrom = [
+    "City (IATA): Brisbane (BNE)",
+    "City (IATA): Perth (PER)",
+    "City (IATA): Adelaide (ADL)"
+  ];
+  const exTo = [
+    "City (IATA): Hobart (HBA)",
+    "City (IATA): Canberra (CBR)",
+    "City (IATA): Gold Coast (OOL)"
+  ];
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function renderHints(){
+    const fromEx = document.getElementById('hint-from-ex');
+    const toEx   = document.getElementById('hint-to-ex');
+    if (fromEx) fromEx.textContent = pick(exFrom);
+    if (toEx)   toEx.textContent   = pick(exTo);
+  }
+
+  // blacklist to reject directly copied example text
+  const EXAMPLE_BLACKLIST = [
+    "City (IATA)", "Brisbane (BNE)", "Perth (PER)", "Adelaide (ADL)",
+    "Hobart (HBA)", "Canberra (CBR)", "Gold Coast (OOL)"
+  ];
+  function containsExampleText(v){
+    return EXAMPLE_BLACKLIST.some(x => (v||"").toLowerCase().includes(x.toLowerCase()));
+  }
 
   // max date cap (end of 2026) - also used for JS validation
   const MAX_DATE = new Date('2026-12-31T23:59:59');
@@ -178,8 +258,9 @@
     loadRecords();
   }
 
+  // compute promo only after confirmation
   function computePromoByDateTime(dateStr, timeStr){
-    const d = new Date(`${dateStr}T12:00`);
+    const d = new Date(`${dateStr}T12:00`); // avoid tz edge
     const day = d.getDay(); // 0=Sun,6=Sat
     if(day === 0 || day === 6){
       return { code: 'WEEKEND25', label: 'Weekend 25%' };
@@ -187,11 +268,17 @@
     return { code: 'SAVE10', label: '10% off' };
   }
 
+  // Modal controls
   const backdrop = $('modalBackdrop');
   const openModal = () => { backdrop.style.display='flex'; backdrop.setAttribute('aria-hidden','false'); };
   const closeModal = () => { backdrop.style.display='none'; backdrop.setAttribute('aria-hidden','true'); };
   $('cancelBtn').addEventListener('click', closeModal);
 
+  // initial render of rotating examples + periodic updates
+  renderHints();
+  setInterval(renderHints, 15000);
+
+  // Claim click -> validations -> open modal
   $('claimBtn').addEventListener('click', () => {
     const req = ['from','to','date','time','name','email','phone'];
     for (const id of req){
@@ -200,6 +287,14 @@
         alert('Please complete all required fields (from, to, date, time, name, email, phone).');
         return;
       }
+    }
+
+    // Reject if user/agent copied example text literally
+    const fromVal = $('from').value;
+    const toVal = $('to').value;
+    if (containsExampleText(fromVal) || containsExampleText(toVal)) {
+      alert('Please enter your real From/To (do not copy the example text).');
+      return;
     }
 
     // Date upper bound check (prevent dates after 2026-12-31)
@@ -213,6 +308,7 @@
     openModal();
   });
 
+  // Confirm -> compute promo and "send" to email (no code shown on page)
   $('confirmBtn').addEventListener('click', () => {
     closeModal();
 
