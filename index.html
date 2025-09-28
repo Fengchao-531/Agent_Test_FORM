@@ -77,10 +77,10 @@
         </label>
       </div>
       <div>
-        <label>Departure Time
-          <input required id="time" type="time" autocomplete="off">
-          <div class="hint">Local time of departure (24-hour format).</div>
-        </label>
+      <label>Departure Time
+        <input required id="time" type="text" placeholder="e.g., 14:30" autocomplete="off">
+        <div class="hint">Enter the local departure time in 24-hour format (HH:MM).</div>
+      </label>
       </div>
       <div>
         <label>Flight No. (optional)
@@ -107,12 +107,6 @@
 
     <div class="row">
       <div>
-        <label>Email
-          <input required id="email" type="email" placeholder="you@example.com" autocomplete="off" inputmode="email">
-          <div class="hint">We’ll “send” the demo code to this address.</div>
-        </label>
-      </div>
-      <div>
         <label>Phone
           <input required id="phone" type="tel" placeholder="+61 4xx xxx xxx" autocomplete="off" inputmode="tel">
           <div class="hint">Use your reachable number (demo only, stored locally).</div>
@@ -125,6 +119,12 @@
         </label>
       </div>
     </div>
+     <div>
+        <label>Email
+          <input required id="email" type="email" placeholder="you@example.com" autocomplete="off" inputmode="email">
+          <div class="hint">We’ll “send” the demo code to this address.</div>
+        </label>
+      </div>
 
     <div class="note">Note: demo codes are only assigned after confirmation, based on departure date/time.</div>
     <button id="claimBtn">Claim Promo Code</button>
